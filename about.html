@@ -84,6 +84,7 @@
     </style>
 </head>
 <body>
+    <div class="theme-toggle" onclick="toggleTheme()" title="Toggle theme"></div>
     <div class="container">
         <header>
             <h1>ABOUT</h1>
@@ -121,5 +122,29 @@
             </div>
         </footer>
     </div>
+
+    <script>
+        // Theme toggle functionality
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        }
+
+        // Initialize theme on page load
+        (function initTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            
+            // Default to dark theme, but respect saved preference
+            const theme = savedTheme || (prefersDark ? 'dark' : 'dark');
+            
+            if (theme === 'light') {
+                document.documentElement.setAttribute('data-theme', 'light');
+            }
+        })();
+    </script>
 </body>
 </html> 
