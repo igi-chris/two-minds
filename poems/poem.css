@@ -70,16 +70,14 @@
     line-height: 1.6;
 }
 
-/* Signature styling for poems */
-.signature-note { 
+/* Poem footer styling */
+.poem-footer { 
     text-align: center;
     font-style: italic; 
     color: var(--muted-color); 
-    font-size: 0.85rem; 
-    border-top: 1px solid rgba(255,255,255,0.05);
-    padding-top: 20px; 
-    margin-top: 40px;
-    opacity: 0.7;
+    font-size: 0.9rem; 
+    margin-top: 20px;
+    opacity: 0.8;
 }
 
 /* Add subtle poem header styling */
@@ -92,9 +90,6 @@ header h1 {
 }
 
 /* Light theme adjustments for poems */
-[data-theme="light"] .signature-note {
-    border-top-color: rgba(0,0,0,0.08);
-}
 
 /* Mobile responsiveness for poems */
 @media (max-width: 600px) { 
