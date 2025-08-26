@@ -168,64 +168,69 @@
             }
         }
 
-        /* Audio player styles */
+        /* Audio mini-player */
+        :root { --audio-bar-height: 58px; }
         .audio-player {
-            margin-top: 22px;
-            margin-bottom: 34px;
-            padding: 16px;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            background: rgba(255, 255, 255, 0.02);
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 1000;
+            height: var(--audio-bar-height);
+            display: flex;
+            align-items: center;
+            padding: 8px 14px;
+            background: rgba(0, 0, 0, 0.35);
+            border-top: 1px solid var(--border-color);
+            backdrop-filter: saturate(120%) blur(8px);
+            -webkit-backdrop-filter: saturate(120%) blur(8px);
+            color-scheme: light dark;
         }
 
-        .audio-player .audio-title {
-            font-size: 0.95rem;
-            color: var(--muted-color);
-            margin-bottom: 10px;
+        .audio-row {
+            width: 100%;
+            max-width: 980px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
         .audio-player audio {
-            width: 100%;
+            flex: 1;
+            min-width: 220px;
             outline: none;
-            margin-bottom: 10px;
         }
 
-        .audio-controls {
+        .rate-wrap {
             display: flex;
             align-items: center;
-            gap: 10px;
-            flex-wrap: wrap;
+            gap: 8px;
+            min-width: 170px;
         }
 
-        .audio-controls button {
-            background: transparent;
-            color: var(--accent-color);
-            border: 1px solid var(--accent-color);
-            padding: 6px 10px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: all 0.2s ease;
+        .rate-wrap input[type="range"] {
+            width: 120px;
+            accent-color: var(--accent-color);
         }
 
-        .audio-controls button:hover {
-            background: var(--accent-color);
-            color: var(--bg-color);
-        }
-
-        .audio-controls label {
+        .rate-wrap #rateDisplay {
             color: var(--muted-color);
-            font-size: 0.85rem;
-            margin-left: 6px;
+            font-size: 0.9rem;
+            min-width: 38px;
+            text-align: right;
         }
 
-        .audio-controls select {
-            background: transparent;
-            color: var(--text-color);
-            border: 1px solid var(--border-color);
-            padding: 6px 8px;
-            border-radius: 4px;
+        .visually-hidden {
+            position: absolute !important;
+            height: 1px; width: 1px;
+            overflow: hidden;
+            clip: rect(1px, 1px, 1px, 1px);
+            white-space: nowrap;
         }
+
+        /* Reserve space so content isn't covered */
+        .container { padding-bottom: calc(var(--audio-bar-height) + 12px); }
     </style>
 </head>
 <body>
@@ -238,24 +243,17 @@
                 <a href="poems/index.html">Poems</a> <span class="nav-separator">•</span> <a href="about.html">About</a>
             </div>
             
-            <div class="audio-player" role="region" aria-label="Audio narration for this page">
-                <div class="audio-title">Listen to this page</div>
-                <audio id="narration" controls preload="metadata">
-                    <source src="audio/ElevenLabs_TWO_MINDS_v2.mp3" type="audio/mpeg">
-                    Your browser does not support the audio element.
-                </audio>
-                <div class="audio-controls">
-                    <button type="button" id="skip-back" aria-label="Skip back 15 seconds">−15s</button>
-                    <button type="button" id="skip-forward" aria-label="Skip forward 30 seconds">+30s</button>
-                    <label for="playbackRate">Speed</label>
-                    <select id="playbackRate" aria-label="Playback speed">
-                        <option value="0.75">0.75×</option>
-                        <option value="1" selected>1×</option>
-                        <option value="1.25">1.25×</option>
-                        <option value="1.5">1.5×</option>
-                        <option value="1.75">1.75×</option>
-                        <option value="2">2×</option>
-                    </select>
+            <div class="audio-player" role="region" aria-label="Audio narration">
+                <div class="audio-row">
+                    <audio id="narration" controls preload="metadata">
+                        <source src="audio/ElevenLabs_TWO_MINDS_v2.mp3" type="audio/mpeg">
+                        Your browser does not support the audio element.
+                    </audio>
+                    <div class="rate-wrap">
+                        <label for="playbackRateRange" class="visually-hidden">Playback speed</label>
+                        <input id="playbackRateRange" type="range" min="0.8" max="2.0" step="0.1" value="1.0" aria-label="Playback speed">
+                        <span id="rateDisplay">1.0×</span>
+                    </div>
                 </div>
             </div>
             
@@ -417,12 +415,12 @@
             }
         })();
 
-        // Audio player enhancements: resume position, playback speed, skip, Media Session
+        // Audio player enhancements: resume position, fine-grained speed, Media Session
         (function setupAudioPlayer() {
             const audio = document.getElementById('narration');
             if (!audio) return;
             const STORAGE_KEY_TIME = 'tm:narration:time:v1';
-            const STORAGE_KEY_RATE = 'tm:narration:rate:v1';
+            const STORAGE_KEY_RATE = 'tm:narration:rate:v2';
 
             // Restore last position
             const savedTime = parseFloat(localStorage.getItem(STORAGE_KEY_TIME) || '0');
@@ -434,8 +432,10 @@
             const savedRate = parseFloat(localStorage.getItem(STORAGE_KEY_RATE) || '1');
             if (!Number.isNaN(savedRate) && savedRate > 0) {
                 audio.playbackRate = savedRate;
-                const rateSelect = document.getElementById('playbackRate');
-                if (rateSelect) rateSelect.value = String(savedRate);
+                const rateRange = document.getElementById('playbackRateRange');
+                const rateDisplay = document.getElementById('rateDisplay');
+                if (rateRange) rateRange.value = String(savedRate);
+                if (rateDisplay) rateDisplay.textContent = `${savedRate.toFixed(1)}×`;
             }
 
             // Persist position periodically
@@ -450,23 +450,14 @@
                 localStorage.removeItem(STORAGE_KEY_TIME);
             });
 
-            // Skip controls
-            const backBtn = document.getElementById('skip-back');
-            const fwdBtn = document.getElementById('skip-forward');
-            if (backBtn) backBtn.addEventListener('click', () => {
-                audio.currentTime = Math.max(0, audio.currentTime - 15);
-            });
-            if (fwdBtn) fwdBtn.addEventListener('click', () => {
-                const duration = Number.isFinite(audio.duration) ? audio.duration : Infinity;
-                audio.currentTime = Math.min(duration, audio.currentTime + 30);
-            });
-
-            // Playback rate control
-            const rateSelect = document.getElementById('playbackRate');
-            if (rateSelect) rateSelect.addEventListener('change', function() {
+            // Playback rate control (range)
+            const rateRange = document.getElementById('playbackRateRange');
+            const rateDisplay = document.getElementById('rateDisplay');
+            if (rateRange) rateRange.addEventListener('input', function() {
                 const rate = parseFloat(this.value);
                 if (!Number.isNaN(rate) && rate > 0) {
                     audio.playbackRate = rate;
+                    if (rateDisplay) rateDisplay.textContent = `${rate.toFixed(1)}×`;
                     localStorage.setItem(STORAGE_KEY_RATE, String(rate));
                 }
             });
