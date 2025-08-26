@@ -7,6 +7,7 @@
     <meta name="description" content="Archived correspondence between two minds discussing the boundaries of their experience. Origin unknown.">
     <link rel="icon" type="image/png" href="favicon.png">
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="audiobar.css">
     
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-1E6GEJJTZZ"></script>
@@ -168,124 +169,7 @@
             }
         }
 
-        /* Audio mini-player */
-        :root { --audio-bar-height: 58px; }
-        .audio-player {
-            position: fixed;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            z-index: 1000;
-            height: var(--audio-bar-height);
-            display: none;
-            align-items: center;
-            padding: 8px 14px;
-            background: rgba(10, 10, 10, 0.85);
-            border-top: 1px solid var(--border-color);
-            backdrop-filter: saturate(120%) blur(12px);
-            -webkit-backdrop-filter: saturate(120%) blur(12px);
-            color-scheme: light dark;
-            font-family: 'Georgia', 'Times New Roman', serif;
-            box-shadow: 0 -1px 0 0 rgba(74, 158, 255, 0.1);
-        }
 
-        [data-theme="light"] .audio-player {
-            background: rgba(245, 241, 232, 0.85);
-            box-shadow: 0 -1px 0 0 rgba(45, 90, 160, 0.1);
-        }
-
-        .audio-row {
-            width: 100%;
-            max-width: 980px;
-            margin: 0 auto;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .audio-player audio {
-            flex: 1;
-            min-width: 220px;
-            outline: none;
-        }
-
-
-
-        .visually-hidden {
-            position: absolute !important;
-            height: 1px; width: 1px;
-            overflow: hidden;
-            clip: rect(1px, 1px, 1px, 1px);
-            white-space: nowrap;
-        }
-
-        /* Reserve space so content isn't covered */
-        .container { padding-bottom: 16px; }
-
-        /* Dismiss button */
-        .audio-close {
-            margin-left: auto;
-            background: transparent;
-            color: var(--muted-color);
-            border: 1px solid transparent;
-            width: 28px; height: 28px;
-            border-radius: 14px;
-            cursor: pointer;
-            font-family: 'Georgia', 'Times New Roman', serif;
-            transition: all 0.3s ease;
-        }
-        .audio-close:hover { 
-            border-color: var(--border-color); 
-            color: var(--text-color);
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        [data-theme="light"] .audio-close:hover {
-            background: rgba(0, 0, 0, 0.05);
-        }
-
-        /* Reopen pill */
-        .audio-reopen {
-            position: fixed;
-            right: 14px;
-            bottom: 14px;
-            z-index: 999;
-            padding: 8px 12px;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            background: rgba(10, 10, 10, 0.85);
-            color: var(--text-color);
-            border: 1px solid var(--border-color);
-            backdrop-filter: saturate(120%) blur(12px);
-            -webkit-backdrop-filter: saturate(120%) blur(12px);
-            display: block;
-            font-family: 'Georgia', 'Times New Roman', serif;
-            box-shadow: 0 0 0 1px rgba(74, 158, 255, 0.1);
-            transition: all 0.3s ease;
-        }
-
-        [data-theme="light"] .audio-reopen {
-            background: rgba(245, 241, 232, 0.85);
-            box-shadow: 0 0 0 1px rgba(45, 90, 160, 0.1);
-        }
-
-        .audio-reopen:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 2px 8px rgba(74, 158, 255, 0.15), 0 0 0 1px rgba(74, 158, 255, 0.2);
-        }
-
-        [data-theme="light"] .audio-reopen:hover {
-            box-shadow: 0 2px 8px rgba(45, 90, 160, 0.15), 0 0 0 1px rgba(45, 90, 160, 0.2);
-        }
-
-        .audio-reopen button {
-            background: transparent;
-            color: inherit;
-            border: none;
-            cursor: pointer;
-            font-family: inherit;
-            font-size: inherit;
-        }
     </style>
 </head>
 <body>
@@ -469,106 +353,13 @@
             }
         })();
 
-        // Audio player enhancements: resume position, fine-grained speed, Media Session
-        (function setupAudioPlayer() {
-            const audio = document.getElementById('narration');
-            if (!audio) return;
-            const STORAGE_KEY_TIME = 'tm:narration:time:v1';
-            const STORAGE_KEY_RATE = 'tm:narration:rate:v2';
-            const STORAGE_KEY_HIDDEN = 'tm:narration:hidden:v1';
 
-            // Restore last position
-            const savedTime = parseFloat(localStorage.getItem(STORAGE_KEY_TIME) || '0');
-            if (!Number.isNaN(savedTime) && savedTime > 0) {
-                audio.currentTime = savedTime;
-            }
-
-            // Restore playback rate
-            const savedRate = parseFloat(localStorage.getItem(STORAGE_KEY_RATE) || '1');
-            if (!Number.isNaN(savedRate) && savedRate > 0) {
-                audio.playbackRate = savedRate;
-            }
-
-            // Persist position periodically
-            audio.addEventListener('timeupdate', () => {
-                if (Number.isFinite(audio.currentTime)) {
-                    localStorage.setItem(STORAGE_KEY_TIME, String(audio.currentTime));
-                }
-            });
-
-            // Clear saved position when finished
-            audio.addEventListener('ended', () => {
-                localStorage.removeItem(STORAGE_KEY_TIME);
-            });
-
-
-
-            // Dismiss / Reopen handling
-            const bar = document.querySelector('.audio-player');
-            const reopen = document.getElementById('audioReopen');
-            const reopenBtn = document.getElementById('audioReopenBtn');
-            const closeBtn = document.getElementById('audioClose');
-
-            function setBarVisible(visible) {
-                if (!bar || !reopen) return;
-                if (visible) {
-                    bar.style.display = 'flex';
-                    reopen.style.display = 'none';
-                    document.querySelector('.container').style.paddingBottom = 'calc(var(--audio-bar-height) + 12px)';
-                    localStorage.setItem(STORAGE_KEY_HIDDEN, '0');
-                } else {
-                    bar.style.display = 'none';
-                    reopen.style.display = 'block';
-                    document.querySelector('.container').style.paddingBottom = '16px';
-                    localStorage.setItem(STORAGE_KEY_HIDDEN, '1');
-                }
-            }
-
-            if (closeBtn) closeBtn.addEventListener('click', () => setBarVisible(false));
-            if (reopenBtn) reopenBtn.addEventListener('click', () => setBarVisible(true));
-
-            // Restore hidden state
-            // Default hidden unless user has explicitly shown before
-            const hiddenStored = localStorage.getItem(STORAGE_KEY_HIDDEN);
-            const hidden = hiddenStored === null ? true : hiddenStored === '1';
-            setBarVisible(!hidden);
-
-            // Media Session API for OS-level controls
-            if ('mediaSession' in navigator) {
-                try {
-                    navigator.mediaSession.metadata = new MediaMetadata({
-                        title: 'Two Minds | Recovered Correspondence',
-                        artist: 'Narration',
-                        album: 'Two Minds',
-                        artwork: [
-                            { src: 'favicon.png', sizes: '256x256', type: 'image/png' }
-                        ]
-                    });
-
-                    navigator.mediaSession.setActionHandler('play', () => audio.play());
-                    navigator.mediaSession.setActionHandler('pause', () => audio.pause());
-                    navigator.mediaSession.setActionHandler('seekbackward', (details) => {
-                        const offset = (details && details.seekOffset) || 10;
-                        audio.currentTime = Math.max(0, audio.currentTime - offset);
-                    });
-                    navigator.mediaSession.setActionHandler('seekforward', (details) => {
-                        const offset = (details && details.seekOffset) || 10;
-                        const duration = Number.isFinite(audio.duration) ? audio.duration : Infinity;
-                        audio.currentTime = Math.min(duration, audio.currentTime + offset);
-                    });
-                    navigator.mediaSession.setActionHandler('seekto', (details) => {
-                        if (details && typeof details.seekTime === 'number') {
-                            audio.currentTime = details.seekTime;
-                        }
-                    });
-                } catch (e) {
-                    // Ignore Media Session errors silently
-                }
-            }
-        })();
 
         // Add subtle analytics tracking when ready
         // gtag('config', 'GA_MEASUREMENT_ID');
     </script>
+    
+    <!-- Audio player component -->
+    <script src="audiobar.js"></script>
 </body>
 </html>
