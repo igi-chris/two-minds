@@ -8,15 +8,15 @@
     --archive-color: #666;
 }
 
-/* Light theme - warm parchment aesthetic */
+/* Light theme - warm scroll parchment with subtle red tinting */
 [data-theme="light"] {
-    --bg-color: #f5f1e8;
-    --text-color: #2c2416;
+    --bg-color: #f4ede6;
+    --text-color: #2a221a;
     --accent-color: #2d5aa0;
     --accent-color-alt: #b8472a;
-    --muted-color: #6b5d47;
-    --border-color: #d4c7b0;
-    --archive-color: #8b7355;
+    --muted-color: #6b554a;
+    --border-color: #d1c0a8;
+    --archive-color: #8a6e58;
 }
 
 * {
@@ -37,11 +37,12 @@ body {
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Light theme background pattern adjustment */
+/* Light theme background pattern - warmer scroll-like tones */
 [data-theme="light"] body {
     background-image:
-        radial-gradient(circle at 20% 20%, rgba(45, 90, 160, 0.08) 0%, transparent 50%),
-        radial-gradient(circle at 80% 80%, rgba(184, 71, 42, 0.06) 0%, transparent 50%);
+        radial-gradient(circle at 20% 20%, rgba(45, 90, 160, 0.06) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(184, 71, 42, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 60% 40%, rgba(139, 110, 88, 0.04) 0%, transparent 60%);
 }
 
 .container {

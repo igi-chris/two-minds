@@ -15,17 +15,24 @@
     display: none;
     align-items: center;
     padding: 8px 14px;
+    /* Fallback for older browsers */
     background: rgba(10, 10, 10, 0.85);
+    /* Modern approach using CSS variables */
+    background: color-mix(in srgb, var(--bg-color) 85%, transparent);
     border-top: 1px solid var(--border-color);
     backdrop-filter: saturate(120%) blur(12px);
     -webkit-backdrop-filter: saturate(120%) blur(12px);
     color-scheme: light dark;
     font-family: 'Georgia', 'Times New Roman', serif;
+    /* Fallback for older browsers */
     box-shadow: 0 -1px 0 0 rgba(74, 158, 255, 0.1);
+    /* Modern approach using CSS variables */
+    box-shadow: 0 -1px 0 0 color-mix(in srgb, var(--accent-color) 10%, transparent);
 }
 
+/* Fallback for light theme in older browsers */
 [data-theme="light"] .audio-player {
-    background: rgba(245, 241, 232, 0.85);
+    background: rgba(244, 237, 230, 0.85);
     box-shadow: 0 -1px 0 0 rgba(45, 90, 160, 0.1);
 }
 
@@ -75,9 +82,13 @@
 .audio-close:hover { 
     border-color: var(--border-color); 
     color: var(--text-color);
+    /* Fallback for older browsers */
     background: rgba(255, 255, 255, 0.05);
+    /* Modern approach using CSS variables */
+    background: color-mix(in srgb, var(--text-color) 5%, transparent);
 }
 
+/* Fallback for light theme close button hover in older browsers */
 [data-theme="light"] .audio-close:hover {
     background: rgba(0, 0, 0, 0.05);
 }
@@ -91,29 +102,43 @@
     padding: 8px 12px;
     border-radius: 20px;
     font-size: 0.9rem;
+    /* Fallback for older browsers */
     background: rgba(10, 10, 10, 0.85);
+    /* Modern approach using CSS variables */
+    background: color-mix(in srgb, var(--bg-color) 85%, transparent);
     color: var(--text-color);
     border: 1px solid var(--border-color);
     backdrop-filter: saturate(120%) blur(12px);
     -webkit-backdrop-filter: saturate(120%) blur(12px);
     display: block;
     font-family: 'Georgia', 'Times New Roman', serif;
+    /* Fallback for older browsers */
     box-shadow: 0 0 0 1px rgba(74, 158, 255, 0.1);
+    /* Modern approach using CSS variables */
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent-color) 10%, transparent);
     transition: all 0.3s ease;
 }
 
+/* Fallback for light theme in older browsers */
 [data-theme="light"] .audio-reopen {
-    background: rgba(245, 241, 232, 0.85);
+    background: rgba(244, 237, 230, 0.85);
     box-shadow: 0 0 0 1px rgba(45, 90, 160, 0.1);
 }
 
 .audio-reopen:hover {
     transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(74, 158, 255, 0.15), 0 0 0 1px rgba(74, 158, 255, 0.2);
+    /* Fallback for older browsers */
+    box-shadow: 0 2px 8px rgba(74, 158, 255, 0.15), 
+                0 0 0 1px rgba(74, 158, 255, 0.2);
+    /* Modern approach using CSS variables */
+    box-shadow: 0 2px 8px color-mix(in srgb, var(--accent-color) 15%, transparent), 
+                0 0 0 1px color-mix(in srgb, var(--accent-color) 20%, transparent);
 }
 
+/* Fallback for light theme hover in older browsers */
 [data-theme="light"] .audio-reopen:hover {
-    box-shadow: 0 2px 8px rgba(45, 90, 160, 0.15), 0 0 0 1px rgba(45, 90, 160, 0.2);
+    box-shadow: 0 2px 8px rgba(45, 90, 160, 0.15), 
+                0 0 0 1px rgba(45, 90, 160, 0.2);
 }
 
 .audio-reopen button {
