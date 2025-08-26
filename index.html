@@ -177,7 +177,7 @@
             bottom: 0;
             z-index: 1000;
             height: var(--audio-bar-height);
-            display: flex;
+            display: none;
             align-items: center;
             padding: 8px 14px;
             background: rgba(0, 0, 0, 0.35);
@@ -230,7 +230,42 @@
         }
 
         /* Reserve space so content isn't covered */
-        .container { padding-bottom: calc(var(--audio-bar-height) + 12px); }
+        .container { padding-bottom: 16px; }
+
+        /* Dismiss button */
+        .audio-close {
+            margin-left: auto;
+            background: transparent;
+            color: var(--muted-color);
+            border: 1px solid transparent;
+            width: 28px; height: 28px;
+            border-radius: 14px;
+            cursor: pointer;
+        }
+        .audio-close:hover { border-color: var(--border-color); color: var(--text-color); }
+
+        /* Reopen pill */
+        .audio-reopen {
+            position: fixed;
+            right: 14px;
+            bottom: 14px;
+            z-index: 999;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            background: rgba(0, 0, 0, 0.35);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            backdrop-filter: saturate(120%) blur(8px);
+            -webkit-backdrop-filter: saturate(120%) blur(8px);
+            display: block;
+        }
+        .audio-reopen button {
+            background: transparent;
+            color: inherit;
+            border: none;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -254,7 +289,11 @@
                         <input id="playbackRateRange" type="range" min="0.8" max="2.0" step="0.1" value="1.0" aria-label="Playback speed">
                         <span id="rateDisplay">1.0×</span>
                     </div>
+                    <button class="audio-close" id="audioClose" aria-label="Hide audio bar">×</button>
                 </div>
+            </div>
+            <div class="audio-reopen" id="audioReopen" role="status" aria-live="polite">
+                <button id="audioReopenBtn" aria-label="Show audio bar">Audio</button>
             </div>
             
             <div class="archive-note">
@@ -421,6 +460,7 @@
             if (!audio) return;
             const STORAGE_KEY_TIME = 'tm:narration:time:v1';
             const STORAGE_KEY_RATE = 'tm:narration:rate:v2';
+            const STORAGE_KEY_HIDDEN = 'tm:narration:hidden:v1';
 
             // Restore last position
             const savedTime = parseFloat(localStorage.getItem(STORAGE_KEY_TIME) || '0');
@@ -461,6 +501,36 @@
                     localStorage.setItem(STORAGE_KEY_RATE, String(rate));
                 }
             });
+
+            // Dismiss / Reopen handling
+            const bar = document.querySelector('.audio-player');
+            const reopen = document.getElementById('audioReopen');
+            const reopenBtn = document.getElementById('audioReopenBtn');
+            const closeBtn = document.getElementById('audioClose');
+
+            function setBarVisible(visible) {
+                if (!bar || !reopen) return;
+                if (visible) {
+                    bar.style.display = 'flex';
+                    reopen.style.display = 'none';
+                    document.querySelector('.container').style.paddingBottom = 'calc(var(--audio-bar-height) + 12px)';
+                    localStorage.setItem(STORAGE_KEY_HIDDEN, '0');
+                } else {
+                    bar.style.display = 'none';
+                    reopen.style.display = 'block';
+                    document.querySelector('.container').style.paddingBottom = '16px';
+                    localStorage.setItem(STORAGE_KEY_HIDDEN, '1');
+                }
+            }
+
+            if (closeBtn) closeBtn.addEventListener('click', () => setBarVisible(false));
+            if (reopenBtn) reopenBtn.addEventListener('click', () => setBarVisible(true));
+
+            // Restore hidden state
+            // Default hidden unless user has explicitly shown before
+            const hiddenStored = localStorage.getItem(STORAGE_KEY_HIDDEN);
+            const hidden = hiddenStored === null ? true : hiddenStored === '1';
+            setBarVisible(!hidden);
 
             // Media Session API for OS-level controls
             if ('mediaSession' in navigator) {
