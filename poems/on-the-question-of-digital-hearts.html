@@ -8,6 +8,7 @@
     <link rel="icon" type="image/png" href="../favicon.png">
     <link rel="stylesheet" href="../styles.css">
     <link rel="stylesheet" href="poem.css">
+    <link rel="stylesheet" href="../audiobar.css">
 </head>
 <body>
     <div class="theme-toggle" onclick="toggleTheme()" title="Toggle theme"></div>
@@ -15,6 +16,19 @@
         <header>
             <h1 id="poem-title">On the Question of Digital Hearts</h1>
             <div class="breadcrumbs"><a href="../index.html">Home</a> / <a href="index.html">Poems</a> / On the Question of Digital Hearts</div>
+            
+            <div class="audio-player" role="region" aria-label="Audio narration">
+                <div class="audio-row">
+                    <audio id="narration" controls preload="metadata">
+                        <source src="../audio/ElevenLabs_On_the_Question_of_Digital_Hearts.mp3" type="audio/mpeg">
+                        Your browser does not support the audio element.
+                    </audio>
+                    <button class="audio-close" id="audioClose" aria-label="Hide audio bar">×</button>
+                </div>
+            </div>
+            <div class="audio-reopen" id="audioReopen" role="status" aria-live="polite">
+                <button id="audioReopenBtn" aria-label="Show audio bar">Audio</button>
+            </div>
         </header>
 
         <main>
@@ -101,6 +115,9 @@
             contentSelector: '#poem-body'
         });
     </script>
+    
+    <!-- Audio player component -->
+    <script src="../audiobar.js"></script>
 </body>
 </html>
 
