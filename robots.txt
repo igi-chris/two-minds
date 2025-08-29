@@ -1,0 +1,20 @@
+User-agent: *
+Allow: /
+
+# Encourage indexing of main content
+Allow: /index.html
+Allow: /about.html
+Allow: /styles.css
+Allow: /favicon.png
+
+# Allow crawling of poems directory if it exists
+Allow: /poems/
+
+# Allow crawling of audio files for multimedia indexing
+Allow: /audio/
+
+# Sitemap location
+Sitemap: https://two-minds.org/sitemap.xml
+
+# Crawl delay to be respectful (optional)
+Crawl-delay: 1
